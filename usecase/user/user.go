@@ -4,16 +4,17 @@ import (
 	"context"
 	"time"
 	"todo-list-app/domain"
+	"todo-list-app/utils"
 )
 
 type userUsecase struct {
 	userRepository domain.UserRepository
-	// timeout        time.Duration
+	timeout        time.Duration
 }
 
 // CreateOrUpdate implements domain.UserUsecase.
 func (u *userUsecase) CreateOrUpdate(ctx context.Context, user *domain.User) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
+	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
 
 	return u.userRepository.CreateOrUpdate(ctx, user)
@@ -21,7 +22,7 @@ func (u *userUsecase) CreateOrUpdate(ctx context.Context, user *domain.User) err
 
 // Delete implements domain.UserUsecase.
 func (u *userUsecase) Delete(ctx context.Context, id uint64) error {
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
+	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
 
 	return u.userRepository.Delete(ctx, id)
@@ -29,7 +30,7 @@ func (u *userUsecase) Delete(ctx context.Context, id uint64) error {
 
 // FindByID implements domain.UserUsecase.
 func (u *userUsecase) FindByID(ctx context.Context, id uint64) (*domain.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
+	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
 
 	return u.userRepository.FindByID(ctx, id)
@@ -37,7 +38,7 @@ func (u *userUsecase) FindByID(ctx context.Context, id uint64) (*domain.User, er
 
 // FindByUsername implements domain.UserUsecase.
 func (u *userUsecase) FindByUsername(ctx context.Context, username string) (*domain.User, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(10*time.Second))
+	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
 
 	return u.userRepository.FindByUsername(ctx, username)
@@ -46,6 +47,6 @@ func (u *userUsecase) FindByUsername(ctx context.Context, username string) (*dom
 func NewUserUsecase(userRepository domain.UserRepository) domain.UserUsecase {
 	return &userUsecase{
 		userRepository: userRepository,
-		// timeout:        time.Duration(time.Duration(utils.TimeoutContext).Seconds()),
+		timeout:        time.Second * time.Duration(utils.TimeoutContext),
 	}
 }
