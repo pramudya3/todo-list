@@ -4,13 +4,9 @@ import (
 	"context"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 	"todo-list-app/database"
 	"todo-list-app/domain"
-	"todo-list-app/http/router"
+	middleware "todo-list-app/http/midlleware"
 	"todo-list-app/repository"
 	"todo-list-app/usecase"
 
@@ -49,6 +45,7 @@ func Inject() fx.Option {
 }
 
 func StartHTTP(lc fx.Lifecycle, params Params) *http.Server {
+	//initiate address server
 	srv := &http.Server{Addr: ":8080"}
 
 	lc.Append(fx.Hook{
@@ -57,7 +54,7 @@ func StartHTTP(lc fx.Lifecycle, params Params) *http.Server {
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			StopServer(srv)
+			StopServer(ctx, srv)
 			return nil
 		},
 	})
@@ -65,16 +62,14 @@ func StartHTTP(lc fx.Lifecycle, params Params) *http.Server {
 }
 
 func StartServer(params Params, srv *http.Server) {
-	// start server gracefully
-	ginServer := gin.Default()
+	ginRouter := gin.Default()
 
-	// initiate routers, if there is new
-	// router's group, just add in this line
-	router.NewHealthcheckRoutes(ginServer.Group("/healthcheck"))
-	router.NewUserRoutes(ginServer.Group("/users"), params.UserUsecase)
+	// add middleware
+	ginRouter.Use(middleware.RateLimiter())
 
 	// for register router into server
-	srv.Handler = ginServer
+	srv.Handler = RegisterRoutes(ginRouter, params)
+
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -83,26 +78,11 @@ func StartServer(params Params, srv *http.Server) {
 	}()
 }
 
-func StopServer(srv *http.Server) {
-	// Stop server gracefully
+func StopServer(ctx context.Context, srv *http.Server) {
+	stop := NewStop(ctx, func() error {
+		// do something
+		return nil
+	}, srv)
 
-	quit := make(chan os.Signal)
-	// kill (no param) default send syscanll.SIGTERM
-	// kill -2 is syscall.SIGINT
-	// kill -9 is syscall. SIGKILL but can"t be catch, so don't need add it
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shutdown Server ...")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Fatal("Server Shutdown:", err)
-	}
-	// catching ctx.Done(). timeout of 5 seconds.
-	select {
-	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
-	}
-	log.Println("Server exiting")
+	stop.Execute()
 }
