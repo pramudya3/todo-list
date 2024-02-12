@@ -9,7 +9,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"todo-list-app/utils"
+	"todo-list-app/internal/utils"
 )
 
 type stop struct {
