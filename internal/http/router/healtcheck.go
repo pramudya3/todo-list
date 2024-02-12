@@ -1,7 +1,7 @@
 package router
 
 import (
-	"todo-list-app/http/handler/healtcheck"
+	"todo-list-app/internal/http/handler/healtcheck"
 
 	"github.com/gin-gonic/gin"
 )

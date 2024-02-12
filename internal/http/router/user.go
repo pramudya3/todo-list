@@ -2,7 +2,7 @@ package router
 
 import (
 	"todo-list-app/domain"
-	"todo-list-app/http/handler/user"
+	"todo-list-app/internal/http/handler/user"
 
 	"github.com/gin-gonic/gin"
 )

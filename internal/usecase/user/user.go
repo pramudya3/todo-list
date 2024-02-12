@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 	"todo-list-app/domain"
-	"todo-list-app/utils"
+	"todo-list-app/internal/utils"
 )
 
 type userUsecase struct {

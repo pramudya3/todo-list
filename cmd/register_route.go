@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"todo-list-app/http/router"
+	"todo-list-app/internal/http/router"
 
 	"github.com/gin-gonic/gin"
 )

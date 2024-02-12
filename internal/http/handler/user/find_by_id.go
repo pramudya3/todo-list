@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"todo-list-app/domain"
@@ -15,6 +16,7 @@ type response struct {
 func FindByID(uc domain.UserUsecase) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx := c.Request.Context()
+		fmt.Println(ctx)
 
 		idString := c.Param("id")
 

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"todo-list-app/database"
 	"todo-list-app/domain"
-	middleware "todo-list-app/http/midlleware"
-	"todo-list-app/repository"
-	"todo-list-app/usecase"
+	middleware "todo-list-app/internal/http/midlleware"
+	"todo-list-app/internal/repository"
+	"todo-list-app/internal/usecase"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"

@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"todo-list-app/repository/user"
+	"todo-list-app/internal/repository/user"
 
 	"go.uber.org/fx"
 )

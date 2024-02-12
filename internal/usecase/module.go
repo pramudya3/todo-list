@@ -1,7 +1,7 @@
 package usecase
 
 import (
-	"todo-list-app/usecase/user"
+	"todo-list-app/internal/usecase/user"
 
 	"go.uber.org/fx"
 )
