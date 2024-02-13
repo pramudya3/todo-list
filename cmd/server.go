@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"todo-list-app/database"
@@ -9,6 +10,7 @@ import (
 	middleware "todo-list-app/internal/http/midlleware"
 	"todo-list-app/internal/repository"
 	"todo-list-app/internal/usecase"
+	"todo-list-app/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/fx"
@@ -38,15 +40,15 @@ func Invoke() fx.Option {
 // injecting our file, like usecase, repository, routes, and etc
 func Inject() fx.Option {
 	return fx.Options(
-		fx.Provide(StartHTTP, database.InitDatabase),
+		fx.Provide(utils.LoadConfig, StartHTTP, database.InitDatabase),
 		usecase.Module,
 		repository.Module,
 	)
 }
 
-func StartHTTP(lc fx.Lifecycle, params Params) *http.Server {
+func StartHTTP(lc fx.Lifecycle, params Params, cfg *domain.Config) *http.Server {
 	//initiate address server
-	srv := &http.Server{Addr: ":8080"}
+	srv := &http.Server{Addr: fmt.Sprintf("%s:%s", cfg.ServerHost, cfg.ServerPort)}
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
@@ -54,8 +56,7 @@ func StartHTTP(lc fx.Lifecycle, params Params) *http.Server {
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			StopServer(ctx, srv)
-			return nil
+			return srv.Shutdown(ctx)
 		},
 	})
 	return srv
@@ -69,11 +70,10 @@ func StartServer(params Params, srv *http.Server) {
 
 	// for register router into server
 	srv.Handler = RegisterRoutes(ginRouter, params)
-
 	go func() {
 		// service connections
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen: %s\n", err)
+			log.Fatalln("error listen server: \n", err)
 		}
 	}()
 }
