@@ -28,7 +28,7 @@ func FindByID(uc domain.UserUsecase) gin.HandlerFunc {
 
 		user, err := uc.FindByID(ctx, uint64(id))
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
 
