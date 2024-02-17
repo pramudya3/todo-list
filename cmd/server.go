@@ -63,6 +63,7 @@ func StartHTTP(lc fx.Lifecycle, params Params, cfg *domain.Config) *http.Server 
 }
 
 func StartServer(params Params, srv *http.Server) {
+	gin.SetMode(gin.ReleaseMode)
 	ginRouter := gin.Default()
 
 	// add middleware
@@ -76,6 +77,7 @@ func StartServer(params Params, srv *http.Server) {
 			log.Fatalln("error listen server: \n", err)
 		}
 	}()
+	log.Println("server is listening at:", srv.Addr)
 }
 
 func StopServer(ctx context.Context, srv *http.Server) {

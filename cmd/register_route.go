@@ -7,10 +7,13 @@ import (
 )
 
 func RegisterRoutes(ginRouter *gin.Engine, params Params) *gin.Engine {
+
 	// initiate routers, if there is new
 	// router's group, just add in this line
-	router.NewHealthcheckRoutes(ginRouter.Group("/healthcheck"))
-	router.NewUserRoutes(ginRouter.Group("/users"), params.UserUsecase)
+	group := ginRouter.Group("api/v1")
+
+	router.NewHealthcheckRoutes(group.Group("/healthz"))
+	router.NewUserRoutes(group.Group("/users"), params.UserUsecase)
 
 	return ginRouter
 }
