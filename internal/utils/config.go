@@ -9,7 +9,7 @@ import (
 
 func LoadConfig() (*domain.Config, error) {
 	viper.AddConfigPath(".")
-	viper.SetConfigName("config")
+	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()
