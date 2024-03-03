@@ -22,9 +22,10 @@ type (
 
 	User struct {
 		ID        int          `json:"id" db:"id"`
-		Username  string       `json:"username" db:"username"`
-		Name      string       `json:"name" db:"name"`
-		Password  string       `json:"password" db:"password"`
+		Username  string       `json:"username" db:"username" binding:"required,alphanum"`
+		Name      string       `json:"name" db:"name" binding:"required,alpha"`
+		Password  string       `json:"password" db:"password" binding:"required"`
+		Email     string       `json:"email" db:"email" binding:"required,email"`
 		CreatedAt sql.NullTime `json:"created_at" db:"created_at"`
 		UpdatedAt sql.NullTime `json:"updated_at" db:"updated_at"`
 	}

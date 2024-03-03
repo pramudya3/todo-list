@@ -5,6 +5,7 @@ import (
 	"testing"
 	"todo-list-app/database"
 	"todo-list-app/domain"
+	"todo-list-app/domain/password"
 	"todo-list-app/internal/utils"
 
 	"github.com/stretchr/testify/require"
@@ -43,13 +44,17 @@ func TestQueryInsertSuccess(t *testing.T) {
 
 	cfg, err := utils.LoadConfig()
 	assert.Nil(err)
+	// var userRepo domain.UserRepository
+	// uc := user.NewUserUsecase(userRepo)
 	db, err := database.InitDatabase(cfg)
 
 	u := NewUserRepository(db)
+	passHashed, err := password.HashAndSalt("password")
+	assert.Nil(err)
 	err = u.CreateOrUpdate(context.Background(), &domain.User{
 		Username: "joko123",
 		Name:     "Joko Thinker",
-		Password: "jokothinker123",
+		Password: passHashed,
 	})
 
 	assert.Nil(err)

@@ -2,9 +2,12 @@ package user
 
 import (
 	"context"
+	"errors"
 	"time"
 	"todo-list-app/domain"
 	"todo-list-app/internal/utils"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type userUsecase struct {
@@ -12,15 +15,19 @@ type userUsecase struct {
 	timeout        time.Duration
 }
 
-// CreateOrUpdate implements domain.UserUsecase.
 func (u *userUsecase) CreateOrUpdate(ctx context.Context, user *domain.User) error {
+	// validation start here:
+	_, err := u.userRepository.FindByUsername(ctx, user.Username)
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return errors.New("username already taken")
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
 
 	return u.userRepository.CreateOrUpdate(ctx, user)
 }
 
-// Delete implements domain.UserUsecase.
 func (u *userUsecase) Delete(ctx context.Context, id uint64) error {
 	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
@@ -28,7 +35,6 @@ func (u *userUsecase) Delete(ctx context.Context, id uint64) error {
 	return u.userRepository.Delete(ctx, id)
 }
 
-// FindByID implements domain.UserUsecase.
 func (u *userUsecase) FindByID(ctx context.Context, id uint64) (*domain.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
@@ -36,7 +42,6 @@ func (u *userUsecase) FindByID(ctx context.Context, id uint64) (*domain.User, er
 	return u.userRepository.FindByID(ctx, id)
 }
 
-// FindByUsername implements domain.UserUsecase.
 func (u *userUsecase) FindByUsername(ctx context.Context, username string) (*domain.User, error) {
 	ctx, cancel := context.WithTimeout(ctx, u.timeout)
 	defer cancel()
